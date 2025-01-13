@@ -193,7 +193,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         status_dict[sid]["page_no"] = page_no
     start_position = (page_no - 1) * STATUS_LIMIT
 
-    elapse = time() - task.listener.time
+    # elapse = time() - task.listener.time
     # elapsed = (
     #         "-"
     #         if elapse < 1
