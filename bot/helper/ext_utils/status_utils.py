@@ -199,7 +199,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
     #         if elapse < 1
     #         else get_readable_time(elapse)
     #     )
-    user_tag = task.listener.tag.replace("@", "@").replace("_", "_")
+    # user_tag = task.listener.tag.replace("@", "@").replace("_", "_")
 
     for index, task in enumerate(
         tasks[start_position : STATUS_LIMIT + start_position],
@@ -238,9 +238,9 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
                 f"\n⌑ <code>ETA    :</code> {task.eta()}"
                 # f"\n⌑ <code>Past   :</code> {elapsed}"
                 f"\n⌑ <code>Engine :</code> <b><i>{task.engine}</i></b>"
-                f"\n⌑ <code>User   :</code> <b>{user_tag}</b>"
-                f"\n⌑ <code>UserID :</code> ||{task.listener.user_id}||"
-                f"\n⌑ <code>Upload :</code> {task.listener.mode}"
+                # f"\n⌑ <code>User   :</code> <b>{user_tag}</b>"
+                # f"\n⌑ <code>UserID :</code> ||{task.listener.user_id}||"
+                # f"\n⌑ <code>Upload :</code> {task.listener.mode}"
             )
             
             if hasattr(task, "seeders_num"):
@@ -258,10 +258,10 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
             msg += (
                 f"\n⌑ <code>Status :</code> <b>{tstatus}</b>"
                 f"\n⌑ <code>Size   :</code> {task.size()}"
-                f"\n⌑ <code>Upload :</code> {task.listener.mode}"
+                # f"\n⌑ <code>Upload :</code> {task.listener.mode}"
                 #f"\n⌑ <code>Past   :</code> {elapsed}"
-                f"\n⌑ <code>User   :</code> {user_tag}"
-                f"\n⌑ <code>UserID :</code> ||{task.listener.user_id}||"
+                # f"\n⌑ <code>User   :</code> {user_tag}"
+                # f"\n⌑ <code>UserID :</code> ||{task.listener.user_id}||"
                 f"\n⌑ <code>Engine :</code> {task.engine}"
             )
         msg += f"\n❌⚠️: /stop_{task.gid()}\n\n"
