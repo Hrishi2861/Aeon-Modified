@@ -238,7 +238,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
                 # f"\n⌑ <code>Past   :</code> {elapsed}"
                 f"\n⌑ <code>Engine :</code> <b><i>{task.engine}</i></b>"
                 # f"\n⌑ <code>User   :</code> <b>{user_tag}</b>"
-                # f"\n⌑ <code>UserID :</code> ||{task.listener.user_id}||"
+                f"\n⌑ <code>UserID :</code> ||{task.listener.user_id}||"
                 # f"\n⌑ <code>Upload :</code> {task.listener.mode}"
             )
             
