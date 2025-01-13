@@ -128,7 +128,7 @@ def add_handlers():
         "ping": (
             ping,
             BotCommands.PingCommand,
-            CustomFilters.authorized,
+            CustomFilters.sudo,
         ),
         "bot_help": (
             bot_help,

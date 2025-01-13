@@ -3,7 +3,7 @@ from bot.helper.ext_utils.status_utils import (
     get_readable_file_size,
     get_readable_time,
 )
-
+from pkg_resources import get_distribution
 
 class GoogleDriveStatus:
     def __init__(self, listener, obj, gid, status):
@@ -12,6 +12,10 @@ class GoogleDriveStatus:
         self._size = self.listener.size
         self._gid = gid
         self._status = status
+        self.engine = f"G-Api v{self._eng_ver()}"
+
+    def _eng_ver(self):
+        return get_distribution("google-api-python-client").version
 
     def processed_bytes(self):
         return get_readable_file_size(self._obj.processed_bytes)

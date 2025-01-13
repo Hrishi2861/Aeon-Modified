@@ -1,33 +1,11 @@
 from bot.helper.telegram_helper.bot_commands import BotCommands
 
 nsfw_keywords = [
-    "porn",
-    "onlyfans",
-    "nsfw",
-    "Brazzers",
-    "adult",
-    "xnxx",
-    "xvideos",
-    "nsfwcherry",
-    "hardcore",
-    "Pornhub",
-    "xvideos2",
-    "youporn",
-    "pornrip",
-    "playboy",
-    "hentai",
-    "erotica",
-    "blowjob",
-    "redtube",
-    "stripchat",
-    "camgirl",
-    "nude",
-    "fetish",
-    "cuckold",
-    "orgy",
-    "horny",
-    "swingers",
-    "ullu",
+"child",
+"cp",
+"r@pe",
+"rape",
+"minor"
 ]
 
 mirror = """<b>Send link along with command line or </b>
@@ -389,7 +367,7 @@ NOTE: Try each command without any argument to see more detalis.
 /{BotCommands.CancelAllCommand} [query]: Cancel all [status] tasks.
 /{BotCommands.ListCommand} [query]: Search in Google Drive(s).
 /{BotCommands.SearchCommand} [query]: Search for torrents with API.
-/{BotCommands.StatusCommand}: Shows a status of all the downloads.
+/{BotCommands.StatusCommand[0]} or /{BotCommands.StatusCommand[1]}: Shows a status of all the downloads.
 /{BotCommands.StatsCommand}: Show stats of the machine where the bot is hosted in.
 /{BotCommands.PingCommand}: Check how long it takes to Ping the Bot (Only Owner & Sudo).
 /{BotCommands.AuthorizeCommand}: Authorize a chat or a user to use the bot (Only Owner & Sudo).

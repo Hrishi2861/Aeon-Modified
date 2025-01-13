@@ -6,7 +6,7 @@ from bot.helper.ext_utils.status_utils import (
     get_readable_file_size,
     get_readable_time,
 )
-
+from subprocess import run as frun
 
 class FFmpegStatus:
     def __init__(self, listener, obj, gid, status=""):
@@ -14,6 +14,18 @@ class FFmpegStatus:
         self._obj = obj
         self._gid = gid
         self._cstatus = status
+        self.engine = f"FFmpeg v{self._eng_ver()}"
+
+    def _eng_ver(self):
+        _engine = frun(
+            [
+                "xtra",
+                "-version"
+            ],
+            capture_output=True,
+            text=True
+        )
+        return _engine.stdout.split("\n")[0].split(" ")[2].split("-")[0]
 
     def speed(self):
         return f"{get_readable_file_size(self._obj.speed_raw)}/s"

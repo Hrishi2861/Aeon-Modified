@@ -24,6 +24,10 @@ class QbittorrentStatus:
         self.seeding = seeding
         self.listener = listener
         self._info = None
+        self.engine = f"qBit {self._eng_ver()}"
+
+    def _eng_ver(self):
+        return xnox_client.app.version
 
     def update(self):
         self._info = get_download(f"{self.listener.mid}", self._info)

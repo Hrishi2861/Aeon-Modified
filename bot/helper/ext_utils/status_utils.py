@@ -15,22 +15,22 @@ SIZE_UNITS = ["B", "KB", "MB", "GB", "TB", "PB"]
 
 
 class MirrorStatus:
-    STATUS_UPLOAD = "Upload"
-    STATUS_DOWNLOAD = "Download"
-    STATUS_CLONE = "Clone"
-    STATUS_QUEUEDL = "QueueDl"
-    STATUS_QUEUEUP = "QueueUp"
-    STATUS_PAUSED = "Pause"
-    STATUS_ARCHIVE = "Archive"
-    STATUS_EXTRACT = "Extract"
-    STATUS_SPLIT = "Split"
-    STATUS_CHECK = "CheckUp"
-    STATUS_SEED = "Seed"
-    STATUS_SAMVID = "SamVid"
-    STATUS_CONVERT = "Convert"
-    STATUS_FFMPEG = "FFmpeg"
-    STATUS_METADATA = "Metadata"
-    STATUS_WATERMARK = "Watermark"
+    STATUS_UPLOAD = "Uploading 📤"
+    STATUS_DOWNLOAD = "Downloading 📥"
+    STATUS_CLONE = "Cloning 🔃"
+    STATUS_QUEUEDL = "DL queued ⏳"
+    STATUS_QUEUEUP = "UL queued ⏳"
+    STATUS_PAUSED = "Paused ⛔️"
+    STATUS_ARCHIVE = "Archiving 🛠"
+    STATUS_EXTRACT = "Extracting 📂"
+    STATUS_SPLIT = "Splitting ✂️"
+    STATUS_CHECK = "CheckUp ⏱"
+    STATUS_SEED = "Seeding 🌧"
+    STATUS_SAMVID = "SamVid 🌐"
+    STATUS_CONVERT = "Converting ♻️"
+    STATUS_FFMPEG = "FFmpeg 🚀"
+    STATUS_METADATA = "Metadata 🧾"
+    STATUS_WATERMARK = "Watermark 🌊"
 
 
 STATUSES = {
@@ -171,13 +171,13 @@ def get_progress_bar_string(pct):
         pct = float(pct.strip("%"))
     p = min(max(pct, 0), 100)
     c_full = int((p + 5) // 10)
-    p_str = "●" * c_full
-    p_str += "○" * (10 - c_full)
+    p_str = "★" * c_full
+    p_str += "✩" * (10 - c_full)
     return p_str
 
 
 async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
-    msg = ""
+    msg = "<b><a href='https://t.me/JetMirror'>ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴊᴇᴛ-ᴍɪʀʀᴏʀ ❤️🚀</a></b>\n"
     button = None
 
     tasks = await sync_to_async(get_specific_tasks, status, sid if is_user else None)
@@ -193,15 +193,25 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         status_dict[sid]["page_no"] = page_no
     start_position = (page_no - 1) * STATUS_LIMIT
 
+    elapse = time() - task.listener.time
+    elapsed = (
+            "-"
+            if elapse < 1
+            else get_readable_time(elapse)
+        )
+    user_tag = task.listener.tag.replace("@", "@").replace("_", "_")
+
     for index, task in enumerate(
         tasks[start_position : STATUS_LIMIT + start_position],
         start=1,
     ):
         tstatus = await sync_to_async(task.status) if status == "All" else status
         if task.listener.is_super_chat:
-            msg += f"<b>{index + start_position}.<a href='{task.listener.message.link}'>{tstatus}</a>: </b>"
+            msg += f"\n<pre>#Jet{index + start_position} ❤🚀...(Processing)</pre>\n"
+            msg += f"Filename: {escape(f"{task.name()}")}\n"
         else:
-            msg += f"<b>{index + start_position}.{tstatus}: </b>"
+            msg += f"\n<pre>#Jet{index + start_position} ❤🚀...(Processing)</pre>\n"
+            msg += f"Filename: {escape(f"{task.name()}")}\n"
         msg += f"<code>{escape(f'{task.name()}')}</code>"
         if task.listener.subname:
             msg += f"\n<i>{task.listener.subname}</i>"
@@ -214,30 +224,47 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
                 if iscoroutinefunction(task.progress)
                 else task.progress()
             )
-            msg += f"\n{get_progress_bar_string(progress)} {progress}"
-            if task.listener.subname:
-                subsize = f"/{get_readable_file_size(task.listener.subsize)}"
-                ac = len(task.listener.files_to_proceed)
-                count = f"({task.listener.proceed_count}/{ac or '?'})"
-            else:
-                subsize = ""
-                count = ""
-            msg += f"\n<b>Processed:</b> {task.processed_bytes()}{subsize} {count}"
-            msg += f"\n<b>Size:</b> {task.size()}"
-            msg += f"\n<b>Speed:</b> {task.speed()}"
-            msg += f"\n<b>ETA:</b> {task.eta()}"
+            msg += (
+                f"\n⌑ <b>{tstatus}</b> » {task.speed()}"
+                f"\n⌑ {get_progress_bar_string(progress)} » <b><i>{progress}</i></b>"
+            # if task.listener.subname:
+            #     subsize = f"/{get_readable_file_size(task.listener.subsize)}"
+            #     ac = len(task.listener.files_to_proceed)
+            #     count = f"({task.listener.proceed_count}/{ac or '?'})"
+            # else:
+            #     subsize = ""
+            #     count = ""
+                f"\n⌑ <code>Done   :</code> {task.processed_bytes()} of {task.size()}"
+                f"\n⌑ <code>ETA    :</code> {task.eta()}"
+                f"\n⌑ <code>Past   :</code> {elapsed}"
+                f"\n⌑ <code>Engine :</code> <b><i>{task.engine}</i></b>"
+                f"\n⌑ <code>User   :</code> <b>{user_tag}</b>"
+                f"\n⌑ <code>UserID :</code> ||{task.listener.user_id}||"
+                f"\n⌑ <code>Upload :</code> {task.listener.mode}"
+            )
+            
             if hasattr(task, "seeders_num"):
                 with contextlib.suppress(Exception):
-                    msg += f"\n<b>Seeders:</b> {task.seeders_num()} | <b>Leechers:</b> {task.leechers_num()}"
+                    msg += f"\n⌑ <code>S/L    :</code> {task.seeders_num()}/{task.leechers_num()}"
         elif tstatus == MirrorStatus.STATUS_SEED:
-            msg += f"\n<b>Size: </b>{task.size()}"
-            msg += f"\n<b>Speed: </b>{task.seed_speed()}"
-            msg += f" | <b>Uploaded: </b>{task.uploaded_bytes()}"
-            msg += f"\n<b>Ratio: </b>{task.ratio()}"
-            msg += f" | <b>Time: </b>{task.seeding_time()}"
+            msg += (
+                f"\n⌑ <code>Size   : </code>{task.size()}"
+                f"\n⌑ <code>Speed  : </code>{task.seed_speed()}"
+                f"\n⌑ <code>Upload : </code>{task.uploaded_bytes()}"
+                f"\n⌑ <code>Ratio  : </code>{task.ratio()}"
+                f"\n⌑ <code>Time   : </code>{task.seeding_time()}"
+            )
         else:
-            msg += f"\n<b>Size: </b>{task.size()}"
-        msg += f"\n/stop_{task.gid()}\n\n"
+            msg += (
+                f"\n⌑ <code>Status :</code> <b>{tstatus}</b>"
+                f"\n⌑ <code>Size   :</code> {task.size()}"
+                f"\n⌑ <code>Upload :</code> {task.listener.mode}"
+                f"\n⌑ <code>Past   :</code> {elapsed}"
+                f"\n⌑ <code>User   :</code> {user_tag}"
+                f"\n⌑ <code>UserID :</code> ||{task.listener.user_id}||"
+                f"\n⌑ <code>Engine :</code> {task.engine}"
+            )
+        msg += f"\n❌⚠️: /stop_{task.gid()}\n\n"
 
     if len(msg) == 0:
         if status == "All":
@@ -245,7 +272,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         msg = f"No Active {status} Tasks!\n\n"
     buttons = ButtonMaker()
     if not is_user:
-        buttons.data_button("📜", f"status {sid} ov", position="header")
+        buttons.data_button("ᴛᴀsᴋ ɪɴғᴏ 🚀", f"status {sid} ov", position="header")
     if len(tasks) > STATUS_LIMIT:
         msg += f"<b>Page:</b> {page_no}/{pages} | <b>Tasks:</b> {tasks_no} | <b>Step:</b> {page_step}\n"
         buttons.data_button("<<", f"status {sid} pre", position="header")
@@ -257,7 +284,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         for label, status_value in list(STATUSES.items()):
             if status_value != status:
                 buttons.data_button(label, f"status {sid} st {status_value}")
-    buttons.data_button("♻️", f"status {sid} ref", position="header")
+    buttons.data_button("ʀᴇғʀᴇsʜ ♻️", f"status {sid} ref", position="header")
     button = buttons.build_menu(8)
     msg += f"<b>CPU:</b> {cpu_percent()}% | <b>FREE:</b> {get_readable_file_size(disk_usage(Config.DOWNLOAD_DIR).free)}"
     msg += f"\n<b>RAM:</b> {virtual_memory().percent}% | <b>UPTIME:</b> {get_readable_time(time() - bot_start_time)}"

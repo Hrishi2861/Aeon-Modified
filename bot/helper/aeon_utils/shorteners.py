@@ -27,7 +27,7 @@ async def short(long_url):
         s = Shortener()
         for _attempt in range(4):
             try:
-                return s.tinyurl.short(long_url)
+                return long_url
             except Exception:
                 await sleep(1)
 

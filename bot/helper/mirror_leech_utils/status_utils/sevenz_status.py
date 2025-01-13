@@ -16,6 +16,10 @@ class SevenZStatus:
         self._gid = gid
         self._start_time = time()
         self._cstatus = status
+        self.engine = f"SevenZ v{self._eng_ver()}"
+
+    def _eng_ver(self):
+        return "3.0"
 
     def gid(self):
         return self._gid

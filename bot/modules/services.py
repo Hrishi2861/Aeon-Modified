@@ -62,9 +62,29 @@ async def start(client, message):
     elif await CustomFilters.authorized(client, message):
         help_command = f"/{BotCommands.HelpCommand}"
         start_string = f"This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.\n<b>Type {help_command} to get a list of available commands</b>"
-        await send_message(message, start_string)
+        buttons = ButtonMaker()
+        buttons.url_button("Join Channel 🚀", "https://t.me/JetMirror", position="header")
+        buttons.url_button("Owner ☀️", "https://t.me/hrishikesh2861", position="header")
+        buttons.url_button("Repo 🌐", "https://github.com/Hrishi2861/Aeon-Modified", position="footer")
+        reply_markup = buttons.build_menu(3)
+        await client.send_photo(
+            chat_id=message.chat.id,
+            photo="/usr/src/app/Jet.jpg",
+            caption=start_string,
+            reply_markup=reply_markup
+        )
     else:
-        await send_message(message, "You are not a authorized user!")
+        buttons = ButtonMaker()
+        buttons.url_button("Join Channel 🚀", "https://t.me/JetMirror", position="header")
+        buttons.url_button("Owner ☀️", "https://t.me/hrishikesh2861", position="header")
+        buttons.url_button("Repo 🌐", "https://github.com/Hrishi2861/Z-Mirror-Modified", position="footer")
+        reply_markup = buttons.build_menu(3)
+        await client.send_photo(
+            chat_id=message.chat.id,
+            photo="/usr/src/app/Jet.jpg",
+            caption="You are not a authorized user!",
+            reply_markup=reply_markup
+        )
     await database.update_pm_users(message.from_user.id)
     return None
 

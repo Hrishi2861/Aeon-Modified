@@ -5,7 +5,7 @@ i = Config.CMD_SUFFIX
 
 
 class BotCommands:
-    StartCommand = f"start{i}"
+    StartCommand = f"start"
     MirrorCommand = [f"mirror{i}", f"m{i}"]
     YtdlCommand = [f"ytdl{i}", f"y{i}"]
     LeechCommand = [f"leech{i}", f"l{i}"]
@@ -18,13 +18,13 @@ class BotCommands:
     ForceStartCommand = [f"forcestart{i}", f"fs{i}"]
     ListCommand = f"list{i}"
     SearchCommand = f"search{i}"
-    StatusCommand = f"status{i}"
+    StatusCommand = [f"status{i}", "sall"]
     UsersCommand = f"users{i}"
     AuthorizeCommand = f"authorize{i}"
     UnAuthorizeCommand = f"unauthorize{i}"
     AddSudoCommand = f"addsudo{i}"
     RmSudoCommand = f"rmsudo{i}"
-    PingCommand = f"ping{i}"
+    PingCommand = [f"ping{i}", "p"]
     RestartCommand = f"restart{i}"
     RestartSessionsCommand = f"restartses{i}"
     StatsCommand = f"stats{i}"
@@ -34,9 +34,9 @@ class BotCommands:
     AExecCommand = f"aexec{i}"
     ExecCommand = f"exec{i}"
     ClearLocalsCommand = f"clearlocals{i}"
-    BotSetCommand = f"botsettings{i}"
-    UserSetCommand = f"settings{i}"
+    BotSetCommand = f"bsetting{i}"
+    UserSetCommand = f"usetting{i}"
     SpeedTest = f"speedtest{i}"
     BroadcastCommand = [f"broadcast{i}", "broadcastall"]
-    SelectCommand = f"sel{i}"
+    SelectCommand = f"btsel{i}"
     RssCommand = f"rss{i}"

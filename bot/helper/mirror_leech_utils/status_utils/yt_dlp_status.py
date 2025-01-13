@@ -4,7 +4,7 @@ from bot.helper.ext_utils.status_utils import (
     get_readable_file_size,
     get_readable_time,
 )
-
+from pkg_resources import get_distribution
 
 class YtDlpStatus:
     def __init__(self, listener, obj, gid):
@@ -12,6 +12,10 @@ class YtDlpStatus:
         self._gid = gid
         self.listener = listener
         self._processed_bytes = 0
+        self.engine = f"Yt-Dlp v{self._eng_ver()}"
+
+    def _eng_ver(self):
+        return get_distribution("yt-dlp").version
 
     def gid(self):
         return self._gid
