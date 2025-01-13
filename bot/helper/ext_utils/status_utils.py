@@ -194,11 +194,11 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
     start_position = (page_no - 1) * STATUS_LIMIT
 
     elapse = time() - task.listener.time
-    elapsed = (
-            "-"
-            if elapse < 1
-            else get_readable_time(elapse)
-        )
+    # elapsed = (
+    #         "-"
+    #         if elapse < 1
+    #         else get_readable_time(elapse)
+    #     )
     user_tag = task.listener.tag.replace("@", "@").replace("_", "_")
 
     for index, task in enumerate(
@@ -236,7 +236,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
             #     count = ""
                 f"\n⌑ <code>Done   :</code> {task.processed_bytes()} of {task.size()}"
                 f"\n⌑ <code>ETA    :</code> {task.eta()}"
-                f"\n⌑ <code>Past   :</code> {elapsed}"
+                # f"\n⌑ <code>Past   :</code> {elapsed}"
                 f"\n⌑ <code>Engine :</code> <b><i>{task.engine}</i></b>"
                 f"\n⌑ <code>User   :</code> <b>{user_tag}</b>"
                 f"\n⌑ <code>UserID :</code> ||{task.listener.user_id}||"
@@ -259,7 +259,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
                 f"\n⌑ <code>Status :</code> <b>{tstatus}</b>"
                 f"\n⌑ <code>Size   :</code> {task.size()}"
                 f"\n⌑ <code>Upload :</code> {task.listener.mode}"
-                f"\n⌑ <code>Past   :</code> {elapsed}"
+                #f"\n⌑ <code>Past   :</code> {elapsed}"
                 f"\n⌑ <code>User   :</code> {user_tag}"
                 f"\n⌑ <code>UserID :</code> ||{task.listener.user_id}||"
                 f"\n⌑ <code>Engine :</code> {task.engine}"
