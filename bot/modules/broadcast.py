@@ -1,27 +1,20 @@
 import asyncio
 from time import time
 
-from nekozee.errors import FloodWait, UserIsBlocked, InputUserDeactivated
-from nekozee.filters import command
-from nekozee.handlers import MessageHandler
+from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked
 
-from bot import DATABASE_URL, bot
-from bot.helper.ext_utils.bot_utils import new_task, get_readable_time
-from bot.helper.ext_utils.db_handler import DbManager
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.helper.ext_utils.bot_utils import new_task
+from bot.helper.ext_utils.db_handler import database
+from bot.helper.ext_utils.status_utils import get_readable_time
 from bot.helper.telegram_helper.message_utils import edit_message, send_message
 
 
 @new_task
 async def broadcast(_, message):
-    if not DATABASE_URL:
-        await send_message(message, "DATABASE_URL not provided!")
-        return
-
     if not message.reply_to_message:
         await send_message(
-            message, "Reply to any message to broadcast messages to users in Bot PM."
+            message,
+            "Reply to any message to broadcast messages to users in Bot PM.",
         )
         return
 
@@ -30,7 +23,7 @@ async def broadcast(_, message):
     updater = time()
     broadcast_message = await send_message(message, "Broadcast in progress...")
 
-    for uid in await DbManager().get_pm_uids():
+    for uid in await database.get_pm_uids():
         try:
             await message.reply_to_message.copy(uid)
             successful += 1
@@ -39,7 +32,7 @@ async def broadcast(_, message):
             await message.reply_to_message.copy(uid)
             successful += 1
         except (UserIsBlocked, InputUserDeactivated):
-            await DbManager().rm_pm_user(uid)
+            await database.rm_pm_user(uid)
             blocked += 1
         except Exception:
             unsuccessful += 1
@@ -65,11 +58,3 @@ def generate_status(total, successful, blocked, unsuccessful, elapsed_time=""):
     if elapsed_time:
         status += f"\n\n<b>Elapsed Time:</b> {elapsed_time}"
     return status
-
-
-bot.add_handler(
-    MessageHandler(
-        broadcast,
-        filters=command(BotCommands.BroadcastCommand) & CustomFilters.owner,
-    )
-)

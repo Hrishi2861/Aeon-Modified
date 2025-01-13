@@ -2,6 +2,8 @@ from re import findall as re_findall
 
 from anytree import NodeMixin
 
+DOWNLOAD_DIR = "/usr/src/app/downloads/"
+
 
 class TorNode(NodeMixin):
     def __init__(
@@ -23,7 +25,7 @@ class TorNode(NodeMixin):
         if parent is not None:
             self.parent = parent
         if size is not None:
-            self.size = size
+            self.fsize = size
         if priority is not None:
             self.priority = priority
         if file_id is not None:
@@ -37,13 +39,14 @@ def qb_get_folders(path):
 
 
 def get_folders(path):
-    fs = re_findall("/usr/src/app/downloads/[0-9]+/(.+)", path)[0]
+    fs = re_findall(f"{DOWNLOAD_DIR}[0-9]+/(.+)", path)[0]
     return fs.split("/")
 
 
-def make_tree(res, aria2=False):
-    parent = TorNode("Torrent")
-    if not aria2:
+def make_tree(res, tool=False):
+    if tool == "qbittorrent":
+        parent = TorNode("QBITTORRENT")
+        folder_id = 0
         for i in res:
             folders = qb_get_folders(i.name)
             if len(folders) > 1:
@@ -55,8 +58,12 @@ def make_tree(res, aria2=False):
                     )
                     if current_node is None:
                         previous_node = TorNode(
-                            folders[j], parent=previous_node, is_folder=True
+                            folders[j],
+                            is_folder=True,
+                            parent=previous_node,
+                            file_id=folder_id,
                         )
+                        folder_id += 1
                     else:
                         previous_node = current_node
                 TorNode(
@@ -78,7 +85,9 @@ def make_tree(res, aria2=False):
                     file_id=i.id,
                     progress=round(i.progress * 100, 5),
                 )
-    else:
+    elif tool == "aria2":
+        parent = TorNode("ARIA2")
+        folder_id = 0
         for i in res:
             folders = get_folders(i["path"])
             priority = 1
@@ -93,64 +102,100 @@ def make_tree(res, aria2=False):
                     )
                     if current_node is None:
                         previous_node = TorNode(
-                            folders[j], parent=previous_node, is_folder=True
+                            folders[j],
+                            is_folder=True,
+                            parent=previous_node,
+                            file_id=folder_id,
                         )
+                        folder_id += 1
                     else:
                         previous_node = current_node
+                try:
+                    progress = round(
+                        (int(i["completedLength"]) / int(i["length"])) * 100,
+                        5,
+                    )
+                except Exception:
+                    progress = 0
                 TorNode(
                     folders[-1],
                     is_file=True,
                     parent=previous_node,
-                    size=i["length"],
+                    size=int(i["length"]),
                     priority=priority,
                     file_id=i["index"],
-                    progress=round(
-                        (int(i["completedLength"]) / int(i["length"])) * 100, 5
-                    ),
+                    progress=progress,
                 )
             else:
+                try:
+                    progress = round(
+                        (int(i["completedLength"]) / int(i["length"])) * 100,
+                        5,
+                    )
+                except Exception:
+                    progress = 0
                 TorNode(
                     folders[-1],
                     is_file=True,
                     parent=parent,
-                    size=i["length"],
+                    size=int(i["length"]),
                     priority=priority,
                     file_id=i["index"],
-                    progress=round(
-                        (int(i["completedLength"]) / int(i["length"])) * 100, 5
-                    ),
+                    progress=progress,
                 )
-    return create_list(parent, ["", 0])
+
+    result = create_list(parent)
+    return {"files": result, "engine": tool}
 
 
-def create_list(par, msg):
-    if par.name != ".unwanted":
-        msg[0] += "<ul>"
-    for i in par.children:
+"""
+def print_tree(parent):
+    for pre, _, node in RenderTree(parent):
+        treestr = u"%s%s" % (pre, node.name)
+        print(treestr.ljust(8), node.is_folder, node.is_file)
+"""
+
+
+def create_list(parent, contents=None):
+    if contents is None:
+        contents = []
+    for i in parent.children:
         if i.is_folder:
-            msg[0] += "<li>"
-            if i.name != ".unwanted":
-                msg[0] += (
-                    f'<input type="checkbox" name="foldernode_{msg[1]}"> <label for="{i.name}">{i.name}</label>'
-                )
-            create_list(i, msg)
-            msg[0] += "</li>"
-            msg[1] += 1
-        else:
-            msg[0] += "<li>"
-            if i.priority == 0:
-                msg[0] += (
-                    f'<input type="checkbox" name="filenode_{i.file_id}" data-size="{i.size}"> <label data-size="{i.size}" for="filenode_{i.file_id}">{i.name}</label> / {i.progress}%'
-                )
-            else:
-                msg[0] += (
-                    f'<input type="checkbox" checked name="filenode_{i.file_id}" data-size="{i.size}"> <label data-size="{i.size}" for="filenode_{i.file_id}">{i.name}</label> / {i.progress}%'
-                )
-            msg[0] += (
-                f'<input type="hidden" value="off" name="filenode_{i.file_id}">'
+            children = []
+            create_list(i, children)
+            contents.append(
+                {
+                    "id": f"folderNode_{i.file_id}",
+                    "name": i.name,
+                    "type": "folder",
+                    "children": children,
+                },
             )
-            msg[0] += "</li>"
+        else:
+            contents.append(
+                {
+                    "id": i.file_id,
+                    "name": i.name,
+                    "size": i.fsize,
+                    "type": "file",
+                    "selected": bool(i.priority),
+                    "progress": i.progress,
+                },
+            )
+    return contents
 
-    if par.name != ".unwanted":
-        msg[0] += "</ul>"
-    return msg
+
+def extract_file_ids(data):
+    selected_files = []
+    unselected_files = []
+    for item in data:
+        if item.get("type") == "file":
+            if item.get("selected"):
+                selected_files.append(str(item["id"]))
+            else:
+                unselected_files.append(str(item["id"]))
+        if item.get("children"):
+            child_selected, child_unselected = extract_file_ids(item["children"])
+            selected_files.extend(child_selected)
+            unselected_files.extend(child_unselected)
+    return selected_files, unselected_files

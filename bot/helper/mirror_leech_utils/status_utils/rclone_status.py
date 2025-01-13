@@ -1,44 +1,40 @@
-from bot.helper.ext_utils.bot_utils import MirrorStatus
-from subprocess import run as rrun
+from bot.helper.ext_utils.status_utils import MirrorStatus
+
 
 class RcloneStatus:
-    def __init__(self, obj, message, gid, status):
-        self.__obj = obj
-        self.__gid = gid
-        self.__status = status
-        self.message = message
-        self.engine = f"Rclone {self._eng_ver()}"
-
-    def _eng_ver(self):
-        return "6.9"
+    def __init__(self, listener, obj, gid, status):
+        self._obj = obj
+        self._gid = gid
+        self._status = status
+        self.listener = listener
 
     def gid(self):
-        return self.__gid
+        return self._gid
 
     def progress(self):
-        return self.__obj.percentage
+        return self._obj.percentage
 
     def speed(self):
-        return self.__obj.speed
+        return self._obj.speed
 
     def name(self):
-        return self.__obj.name
+        return self.listener.name
 
     def size(self):
-        return self.__obj.size
+        return self._obj.size
 
     def eta(self):
-        return self.__obj.eta
+        return self._obj.eta
 
     def status(self):
-        if self.__status == "dl":
-            return MirrorStatus.STATUS_DOWNLOADING
-        if self.__status == "up":
-            return MirrorStatus.STATUS_UPLOADING
-        return MirrorStatus.STATUS_CLONING
+        if self._status == "dl":
+            return MirrorStatus.STATUS_DOWNLOAD
+        if self._status == "up":
+            return MirrorStatus.STATUS_UPLOAD
+        return MirrorStatus.STATUS_CLONE
 
     def processed_bytes(self):
-        return self.__obj.transferred_size
+        return self._obj.transferred_size
 
-    def download(self):
-        return self.__obj
+    def task(self):
+        return self._obj

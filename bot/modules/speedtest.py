@@ -1,15 +1,13 @@
 from speedtest import Speedtest
-from nekozee.filters import command
-from nekozee.handlers import MessageHandler
 
-from bot import LOGGER, bot
-from bot.helper.ext_utils.bot_utils import new_task, get_readable_file_size
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot import LOGGER
+from bot.core.aeon_client import TgClient
+from bot.helper.ext_utils.bot_utils import new_task
+from bot.helper.ext_utils.status_utils import get_readable_file_size
 from bot.helper.telegram_helper.message_utils import (
+    delete_message,
     edit_message,
     send_message,
-    delete_message,
 )
 
 
@@ -24,7 +22,7 @@ async def speedtest(_, message):
         test.upload()
         return test.results
 
-    result = await bot.loop.run_in_executor(None, get_speedtest_results)
+    result = await TgClient.bot.loop.run_in_executor(None, get_speedtest_results)
 
     if not result:
         await edit_message(speed, "Speedtest failed to complete.")
@@ -42,11 +40,3 @@ async def speedtest(_, message):
     except Exception as e:
         LOGGER.error(str(e))
         await edit_message(speed, string_speed)
-
-
-bot.add_handler(
-    MessageHandler(
-        speedtest,
-        filters=command(BotCommands.SpeedCommand) & CustomFilters.authorized,
-    )
-)
