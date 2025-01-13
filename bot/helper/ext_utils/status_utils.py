@@ -212,7 +212,6 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         else:
             msg += f"\n<pre>#Jet{index + start_position} ❤🚀...(Processing)</pre>\n"
             msg += f"Filename: {escape(f"{task.name()}")}\n"
-        msg += f"<code>{escape(f'{task.name()}')}</code>"
         if task.listener.subname:
             msg += f"\n<i>{task.listener.subname}</i>"
         if (
