@@ -12,10 +12,10 @@ class TelegramStatus:
         self._size = self.listener.size
         self._gid = gid
         self._status = status
-        self.engine = f"Telegram v{self._eng_ver()}"
+        self.engine = f"Electrogram v{self._eng_ver()}"
 
     def _eng_ver(self):
-        return get_distribution("pyrogram").version
+        return get_distribution("electrogram").version
 
     def processed_bytes(self):
         return get_readable_file_size(self._obj.processed_bytes)
